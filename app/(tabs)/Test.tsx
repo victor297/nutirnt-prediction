@@ -9,8 +9,8 @@ import {
   SafeAreaView,
   StatusBar,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { foodData, thresholds } from "@/constants/data";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type NutritionStatus = {
   calories: number;
@@ -76,17 +76,13 @@ export default function App() {
         (f) => f.foodItem.toLowerCase() === food.toLowerCase()
       );
       if (foodItem) {
-        // Perform null/undefined checks before accessing properties
-        totalCalories += foodItem.calories || 0;
-        totalProtein += foodItem.protein || 0;
-        totalFat += foodItem.fat || 0;
-        totalCarbs += foodItem.carbohydrates || 0;
-        totalFiber += foodItem.fiber || 0;
-        totalSugar += foodItem.sugar || 0;
-        totalSodium += foodItem.sodium || 0;
-      } else {
-        console.log(`Food item "${food}" not found in foodData.`);
-        // Decide how to handle this case (e.g., skip, log, etc.)
+        totalCalories += foodItem.calories;
+        totalProtein += foodItem.protein;
+        totalFat += foodItem.fat;
+        totalCarbs += foodItem.carbohydrates;
+        totalFiber += foodItem.fiber;
+        totalSugar += foodItem.sugar;
+        totalSodium += foodItem.sodium;
       }
     });
 
@@ -149,80 +145,6 @@ export default function App() {
     setDailyMeals(newDailyMeals);
     saveMeals(newDailyMeals);
   };
-
-  const calculateWeeklyNutrition = () => {
-    const weeklySummary = dailyMeals.reduce(
-      (acc, meal) => {
-        acc.calories += meal.calories || 0;
-        acc.protein += meal.protein || 0;
-        acc.fat += meal.fat || 0;
-        acc.carbohydrates += meal.carbohydrates || 0;
-        acc.fiber += meal.fiber || 0;
-        acc.sugar += meal.sugar || 0;
-        acc.sodium += meal.sodium || 0;
-        return acc;
-      },
-      {
-        calories: 0,
-        protein: 0,
-        fat: 0,
-        carbohydrates: 0,
-        fiber: 0,
-        sugar: 0,
-        sodium: 0,
-      }
-    );
-
-    const overallStatus = {
-      status: {
-        calories:
-          weeklySummary.calories < thresholds.calories.low
-            ? "low"
-            : weeklySummary.calories > thresholds.calories.high
-            ? "high"
-            : "normal",
-        protein:
-          weeklySummary.protein < thresholds.protein.low
-            ? "low"
-            : weeklySummary.protein > thresholds.protein.high
-            ? "high"
-            : "normal",
-        fat:
-          weeklySummary.fat < thresholds.fat.low
-            ? "low"
-            : weeklySummary.fat > thresholds.fat.high
-            ? "high"
-            : "normal",
-        carbohydrates:
-          weeklySummary.carbohydrates < thresholds.carbohydrates.low
-            ? "low"
-            : weeklySummary.carbohydrates > thresholds.carbohydrates.high
-            ? "high"
-            : "normal",
-        fiber:
-          weeklySummary.fiber < thresholds.fiber.low
-            ? "low"
-            : weeklySummary.fiber > thresholds.fiber.high
-            ? "high"
-            : "normal",
-        sugar:
-          weeklySummary.sugar < thresholds.sugar.low
-            ? "low"
-            : weeklySummary.sugar > thresholds.sugar.high
-            ? "high"
-            : "normal",
-        sodium:
-          weeklySummary.sodium < thresholds.sodium.low
-            ? "low"
-            : weeklySummary.sodium > thresholds.sodium.high
-            ? "high"
-            : "normal",
-      },
-    };
-    return { ...weeklySummary, ...overallStatus };
-  };
-
-  const weeklyNutrition = calculateWeeklyNutrition();
 
   const clearData = async () => {
     try {
@@ -333,71 +255,6 @@ export default function App() {
       <TouchableOpacity style={styles.clearButton} onPress={clearData}>
         <Text style={styles.clearButtonText}>Clear Data</Text>
       </TouchableOpacity>
-      <Text style={styles.summaryHeader}>Weekly Nutrition Summary</Text>
-
-      <View style={styles.nutritionSummary}>
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionValue}>
-            {weeklyNutrition.carbohydrates.toFixed(1)}g
-          </Text>
-          <Text style={styles.nutritionLabel}>carbs</Text>
-          <Text style={styles.nutritionLabel}>
-            {weeklyNutrition.status.carbohydrates}
-          </Text>
-        </View>
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionValue}>
-            {weeklyNutrition.protein.toFixed(1)}g
-          </Text>
-          <Text style={styles.nutritionLabel}>proteins</Text>
-          <Text style={styles.nutritionLabel}>
-            {weeklyNutrition.status.protein}
-          </Text>
-        </View>
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionValue}>{weeklyNutrition.calories}</Text>
-          <Text style={styles.nutritionLabel}>Kcal</Text>
-          <Text style={styles.nutritionLabel}>
-            {weeklyNutrition.status.calories}
-          </Text>
-        </View>
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionValue}>
-            {weeklyNutrition.fat.toFixed(1)}g
-          </Text>
-          <Text style={styles.nutritionLabel}>fats</Text>
-          <Text style={styles.nutritionLabel}>
-            {weeklyNutrition.status.fat}
-          </Text>
-        </View>
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionValue}>
-            {weeklyNutrition.fiber.toFixed(1)}g
-          </Text>
-          <Text style={styles.nutritionLabel}>fiber</Text>
-          <Text style={styles.nutritionLabel}>
-            {weeklyNutrition.status.fiber}
-          </Text>
-        </View>
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionValue}>
-            {weeklyNutrition.sugar.toFixed(1)}g
-          </Text>
-          <Text style={styles.nutritionLabel}>sugar</Text>
-          <Text style={styles.nutritionLabel}>
-            {weeklyNutrition.status.sugar}
-          </Text>
-        </View>
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionValue}>
-            {weeklyNutrition.sodium.toFixed(1)}mg
-          </Text>
-          <Text style={styles.nutritionLabel}>sodium</Text>
-          <Text style={styles.nutritionLabel}>
-            {weeklyNutrition.status.sodium}
-          </Text>
-        </View>
-      </View>
 
       <Text style={styles.summaryHeader}>Daily Nutrition Summary</Text>
       <FlatList
@@ -411,7 +268,7 @@ export default function App() {
               </Text>
               <Text style={styles.nutritionLabel}>Carbs</Text>
               <Text style={styles.nutritionLabel}>
-                {item.status && item.status.carbohydrates}
+                {item.status.carbohydrates}
               </Text>
             </View>
             <View style={styles.nutritionRow}>
@@ -419,50 +276,38 @@ export default function App() {
                 {item.protein.toFixed(1)}g
               </Text>
               <Text style={styles.nutritionLabel}>Proteins</Text>
-              <Text style={styles.nutritionLabel}>
-                {item.status && item.status.protein}
-              </Text>
+              <Text style={styles.nutritionLabel}>{item.status.protein}</Text>
             </View>
             <View style={styles.nutritionRow}>
               <Text style={styles.nutritionValue}>{item.calories}</Text>
               <Text style={styles.nutritionLabel}>Kcal</Text>
-              <Text style={styles.nutritionLabel}>
-                {item.status && item.status.calories}
-              </Text>
+              <Text style={styles.nutritionLabel}>{item.status.calories}</Text>
             </View>
             <View style={styles.nutritionRow}>
               <Text style={styles.nutritionValue}>{item.fat.toFixed(1)}g</Text>
               <Text style={styles.nutritionLabel}>Fats</Text>
-              <Text style={styles.nutritionLabel}>
-                {item.status && item.status.fat}
-              </Text>
+              <Text style={styles.nutritionLabel}>{item.status.fat}</Text>
             </View>
             <View style={styles.nutritionRow}>
               <Text style={styles.nutritionValue}>
                 {item.fiber.toFixed(1)}g
               </Text>
               <Text style={styles.nutritionLabel}>Fiber</Text>
-              <Text style={styles.nutritionLabel}>
-                {item.status && item.status.fiber}
-              </Text>
+              <Text style={styles.nutritionLabel}>{item.status.fiber}</Text>
             </View>
             <View style={styles.nutritionRow}>
               <Text style={styles.nutritionValue}>
                 {item.sugar.toFixed(1)}g
               </Text>
               <Text style={styles.nutritionLabel}>Sugar</Text>
-              <Text style={styles.nutritionLabel}>
-                {item.status && item.status.sugar}
-              </Text>
+              <Text style={styles.nutritionLabel}>{item.status.sugar}</Text>
             </View>
             <View style={styles.nutritionRow}>
               <Text style={styles.nutritionValue}>
                 {item.sodium.toFixed(1)}mg
               </Text>
               <Text style={styles.nutritionLabel}>Sodium</Text>
-              <Text style={styles.nutritionLabel}>
-                {item.status && item.status.sodium}
-              </Text>
+              <Text style={styles.nutritionLabel}>{item.status.sodium}</Text>
             </View>
           </View>
         )}
@@ -474,96 +319,52 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "black",
-    padding: 16,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+    marginTop: StatusBar.currentHeight || 0,
   },
   header: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 16,
-    textAlign: "center",
-    color: "white",
+    marginBottom: 20,
   },
   input: {
-    borderColor: "green",
+    height: 40,
+    width: "100%",
+    borderColor: "gray",
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-    fontSize: 16,
-    backgroundColor: "white",
+    paddingHorizontal: 10,
+    marginBottom: 20,
   },
   foodChips: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 16,
+    flexWrap: "wrap",
+    marginBottom: 20,
   },
   foodChip: {
-    backgroundColor: "#E0E0E0",
-    padding: 8,
-    borderRadius: 16,
+    backgroundColor: "#f0f0f0",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    marginRight: 10,
+    marginBottom: 10,
   },
   foodChipText: {
     fontSize: 14,
-    color: "#000",
   },
   checkButton: {
-    backgroundColor: "#28A745",
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 16,
+    backgroundColor: "#007bff",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginBottom: 20,
   },
   checkButtonText: {
     color: "#fff",
     fontSize: 16,
-  },
-  summaryHeader: {
-    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 8,
-    color: "white",
-    textAlign: "center",
-  },
-  summaryDescription: {
-    fontSize: 14,
-    marginBottom: 8,
-    color: "white",
-    textAlign: "center",
-  },
-  nutritionSummary: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 16,
-    backgroundColor: "#28A745",
-    borderRadius: 6,
-    padding: 3,
-  },
-  nutritionRow: {
-    alignItems: "center",
-  },
-  nutritionValue: {
-    fontSize: 12,
-    color: "white",
-  },
-  nutritionLabel: {
-    fontSize: 14,
-    color: "white",
-  },
-  weeklySummary: {
-    marginBottom: 16,
-  },
-  summaryText: {
-    fontSize: 16,
-    marginBottom: 4,
-  },
-  mealItem: {
-    padding: 8,
-    borderBottomColor: "#ccc",
-    borderBottomWidth: 1,
-  },
-  mealText: {
-    fontSize: 14,
   },
   clearButton: {
     backgroundColor: "#dc3545",
@@ -576,6 +377,32 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
-    textAlign: "center",
+  },
+  nutritionSummary: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+    width: "100%",
+  },
+  nutritionRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 5,
+  },
+  nutritionValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  nutritionLabel: {
+    fontSize: 14,
+    color: "#666",
+  },
+  summaryHeader: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 20,
+    marginBottom: 10,
   },
 });
